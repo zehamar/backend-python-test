@@ -1,0 +1,3 @@
+Security: 
+- Encrypt data base MD5
+- Add captcha control if several login failed
