@@ -15,6 +15,17 @@ def username_ok(string):
     else:
        return False
 
+
+# Truncate long text for displaying
+def trunc_string(max_len, string):
+    if len(string) > max_len:
+       trunc_string = string[0:max_len-3]+"..."
+    else:
+       trunc_string = string
+    return trunc_string
+
+
+
 @app.route('/')
 def home():
     with app.open_resource('../README.md', mode='r') as f:
@@ -81,13 +92,19 @@ def todos_POST():
         % (session['user']['id'], request.form.get('description', ''))
         )
         g.db.commit()
+        descrip = trunc_string(32,request.form.get('description')) # string len to display : 32 char
+        flash('Description "%s" is successfully added, by User id : %s' % (descrip, session['user']['id']))
     return redirect('/todo')
 
 
 @app.route('/todo/<id>', methods=['POST'])
 def todo_delete(id):
     if not session.get('logged_in'):
-        return redirect('/login')
+        return redirect('/login')    
+    cur = g.db.execute("SELECT * FROM todos WHERE id ='%s'" % id)
+    todo = cur.fetchone()
+    descrip = trunc_string(32, todo['description']) # string len to display : 32 char
+    flash("Task #%s [User id : %s, Description : \"%s\"] has been deleted" % (id,todo['user_id'],descrip))
     g.db.execute("DELETE FROM todos WHERE id ='%s'" % id)
     g.db.commit()
     return redirect('/todo')
