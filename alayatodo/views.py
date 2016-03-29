@@ -116,4 +116,18 @@ def todo_json(id):
     todo = cur.fetchone()
     todo_dict = {'Id' : todo['id'], 'user_id': todo['user_id'],'description': todo['description']}
     return json.dumps(todo_dict)
-
+    
+    
+    
+@app.route('/todo/<id>/complete', methods=['POST'])
+def todo_complete(id):
+    if not session.get('logged_in'):
+        return redirect('/login')
+    cur = g.db.execute("SELECT status FROM todos WHERE id = '%s'" % id)
+    todo = cur.fetchone()
+    if todo['status'] == 1:
+       g.db.execute("UPDATE todos SET status = 0 WHERE id = '%s'" % id)
+    else:
+       g.db.execute("UPDATE todos SET status = 1 WHERE id = '%s'" % id)
+    g.db.commit()    
+    return redirect('/todo')
