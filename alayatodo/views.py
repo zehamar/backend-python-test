@@ -46,16 +46,24 @@ def login():
 def login_POST():
     username = request.form.get('username')
     password = request.form.get('password')
-    if username_ok(username): 
-       sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'";
-       cur = g.db.execute(sql % (username, password))
-       user = cur.fetchone()
-       if user:
-           session['user'] = dict(user)
-           session['logged_in'] = True
-           return redirect('/todo')
-    else: 
-       flash("Wrong username format")
+    if username == '':
+          flash('Please, enter username')
+    elif password == '':
+          flash('Please, enter password')
+    else:       
+         if username_ok(username): 
+            sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'";
+            cur = g.db.execute(sql % (username, password))
+            user = cur.fetchone()
+            if user:
+                session['user'] = dict(user)
+                session['logged_in'] = True
+                flash("Welcom, %s" %(username));
+                return redirect('/todo')
+            else: 
+                flash('Wrong login, please enter a valid login, <or do somthing else>'); 
+         else:
+            flash("Wrong username format")
     return redirect('/login')
 
 
