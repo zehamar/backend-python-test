@@ -3,6 +3,18 @@
 {% block content %}
 <div class="col-md-4 col-md-offset-4">
     <h1>Todo List:</h1>
+    {% if 1 %}
+    {% if page_count > 1 %}
+    <ul class="pagination">
+        {% for i in range(1, page_count+1) %}
+        <li {% if i == cur_page %}class="active"
+        {% endif %}
+        ><a href="/todo/page/{{ i }}">{{ i }}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endif %}
+    
     <table class="table table-striped">
         <th>#</th><th>User</th><th>Description</th><th>Status</th><th>Delete</th>
         {% for todo in todos %}

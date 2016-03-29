@@ -8,7 +8,7 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS todos;
 CREATE TABLE todos (
   id INTEGER PRIMARY KEY,
-  user_id INT(11) NOT NULL,
+  user_id INT(99) NOT NULL,
   description VARCHAR(255),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );

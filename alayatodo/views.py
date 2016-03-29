@@ -8,7 +8,10 @@ from flask import (
     flash,
     json
     )
-
+ 
+from pagination import db 
+ 
+ 
 # Check if no special characters, no long string
 def username_ok(string):
     if ( (string.isalnum()) and (len(string) < 64 ) ) :
@@ -70,16 +73,6 @@ def todo(id):
     return render_template('todo.html', todo=todo)
 
 
-@app.route('/todo', methods=['GET'])
-@app.route('/todo/', methods=['GET'])
-def todos():
-    if not session.get('logged_in'):
-        return redirect('/login')
-    cur = g.db.execute("SELECT * FROM todos")
-    todos = cur.fetchall()
-    return render_template('todos.html', todos=todos)
-
-
 @app.route('/todo', methods=['POST'])
 @app.route('/todo/', methods=['POST'])
 def todos_POST():
@@ -131,3 +124,28 @@ def todo_complete(id):
        g.db.execute("UPDATE todos SET status = 1 WHERE id = '%s'" % id)
     g.db.commit()    
     return redirect('/todo')
+
+ 
+ 
+
+# Change if 0: to if 1: below, {% if 0 %} to {% if 1 %} in totos.html L6 to enable pagination 
+if 1:
+   @app.route('/todo', methods=['GET'], defaults={'page': 1})
+   @app.route('/todo/', methods=['GET'], defaults={'page': 1})
+   @app.route('/todo/page/<int:page>', methods=['GET'])
+   def todos(page):
+       if not session.get('logged_in'):
+           return redirect('/login')
+       todos = db.page(page)
+       page_count = db.page_count()
+       return render_template('todos.html', todos=todos, page_count=page_count, currentpage=page)   
+else:
+   @app.route('/todo', methods=['GET'])
+   @app.route('/todo/', methods=['GET'])
+   def todos():
+       if not session.get('logged_in'):
+           return redirect('/login')
+       cur = g.db.execute("SELECT * FROM todos")
+       todos = cur.fetchall()
+       return render_template('todos.html', todos=todos)
+
