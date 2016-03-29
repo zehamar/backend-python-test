@@ -4,9 +4,16 @@ from flask import (
     redirect,
     render_template,
     request,
-    session
+    session,
+    flash
     )
 
+# Check if no special characters, no long string
+def username_ok(string):
+    if ( (string.isalnum()) and (len(string) < 64 ) ) :
+       return True
+    else:
+       return False
 
 @app.route('/')
 def home():
@@ -24,15 +31,16 @@ def login():
 def login_POST():
     username = request.form.get('username')
     password = request.form.get('password')
-
-    sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'";
-    cur = g.db.execute(sql % (username, password))
-    user = cur.fetchone()
-    if user:
-        session['user'] = dict(user)
-        session['logged_in'] = True
-        return redirect('/todo')
-
+    if username_ok(username): 
+       sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'";
+       cur = g.db.execute(sql % (username, password))
+       user = cur.fetchone()
+       if user:
+           session['user'] = dict(user)
+           session['logged_in'] = True
+           return redirect('/todo')
+    else: 
+       flash("Wrong username format")
     return redirect('/login')
 
 
