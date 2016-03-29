@@ -86,15 +86,19 @@ def todo(id):
 def todos_POST():
     if not session.get('logged_in'):
         return redirect('/login')
-    if not request.form.get('description', ''):
+    old_description = request.form.get("description")
+    description = old_description
+    if '\'' in old_description: 
+         description = old_description.replace("'", "''")
+    if (description == "" or description ==" "):
         flash("Please, enter description.")
     else:
         g.db.execute(	
         "INSERT INTO todos (user_id, description) VALUES ('%s', '%s')"
-        % (session['user']['id'], request.form.get('description', ''))
+        % (session['user']['id'], description)
         )
         g.db.commit()
-        descrip = trunc_string(32,request.form.get('description')) # string len to display : 32 char
+        descrip = trunc_string(32,description) # string len to display : 32 char
         flash('Description "%s" is successfully added, by User id : %s' % (descrip, session['user']['id']))
     return redirect('/todo')
 
